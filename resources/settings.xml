@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+	<!-- GENERAL -->
+	<category label="30030">
+		<setting id="epg_interval" type="labelenum" label="30031" values="-|6 h|12 h|24 h|48 h|72 h" default="12 h" />
+		<setting id="hang_detection" type="labelenum" label="30035" values="-|5 min|10 min|15 min|20 min|30 min|60 min" default="10 min" />
+		<setting id="separator1" type="sep" />
+		<setting id="progressbar_status" type="bool" label="30032" default="false" />
+		<setting id="notify_status" type="bool" label="30033" default="true" />
+		<setting id="backup_xml" type="bool" label="30034" default="true" />
+		<setting id="separator2" type="sep" />
+		<setting id="socket_port" type="number" label="30037" default="8089" />
+	</category>
+	<!-- WebGrab++ SETTINGS -->
+	<category label="30040">
+		<setting id="wg_script" type="file" label="30041" default="~/wg++/update.sh" />
+		<setting id="wg_logfile" type="file" label="30042" default="~/wg++/WebGrab++.log.txt" />
+		<setting id="wg_xmlfile" type="file" label="30043" default="~/wg++/guide.xml" />
+	</category>
+	<!-- BACKEND SETTINGS -->
+	<category label="30050">
+		<setting id="sck_transfer" type="bool" label="30051" default="false" />
+		<setting id="sck_url" type="file" label="30052" enable="eq(-1,true)" default="~/xmltv.sock" />
+		<setting id="post_transfer" type="bool" label="30053" default="false" />
+		<setting id="post_script" type="file" label="30054" enable="eq(-1,true)" default="~/postproc.sh" />
+		<setting id="separator3" type="sep" />
+		<setting id="update_kodi" type="bool" label="30055" default="false" />
+		<setting id="not_update_running" type="bool" label="30056" enable="eq(-1,true)" default="true" />
+	</category>
+</settings>

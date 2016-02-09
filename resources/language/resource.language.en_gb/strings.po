@@ -1,0 +1,251 @@
+# XBMC Media Center language file
+# Addon Name: WebGrab++ Management for Kodi
+# Addon id: service.webgrabplusplus
+# Addon version: 0.9.8
+# Addon Provider: Helly1206
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2014-04-16 15:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "Addon Summary"
+msgid "WebGrab++ Management for Kodi"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "WebGrab++ management to run and check WebGrab++ status from Kodi."
+msgstr ""
+
+msgctxt "#30000"
+msgid "WebGrab++ Manager"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Service not running error"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Service WebGrab++ is not running"
+msgstr ""
+
+msgctxt "#30003"
+msgid "EPG grabbing started"
+msgstr ""
+
+msgctxt "#30004"
+msgid "EPG grabbing finished"
+msgstr ""
+
+msgctxt "#30005"
+msgid "EPG grabbing progress [%d of %d channels]"
+msgstr ""
+
+msgctxt "#30006"
+msgid "WebGrab++ grabbing error"
+msgstr ""
+
+msgctxt "#30007"
+msgid "XML-file not found"
+msgstr ""
+
+msgctxt "#30008"
+msgid "EPG-update script not found"
+msgstr ""
+
+msgctxt "#30009"
+msgid "EPG-update execution error"
+msgstr ""
+
+msgctxt "#30010"
+msgid "XML-backup-file not found"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Socket not found, no socket transfer possible"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Postprocessor not found, no postprocessing possible"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Postprocessor execution error"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Postprocessor error"
+msgstr ""
+
+msgctxt "#30015"
+msgid "EPG-grabbing timeout"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Postprocessor timeout"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Postprocessor finished"
+msgstr ""
+
+#empty strings from id 30018 to 30029
+
+msgctxt "#30030"
+msgid "General"
+msgstr ""
+
+msgctxt "#30031"
+msgid "EPG update interval"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Display progressbar"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Notify update status"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Backup xml file"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Hang detection timeout"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Kodi external access port"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Socket return channel port"
+msgstr ""
+
+#empty strings from id 30038 to 30039
+
+msgctxt "#30040"
+msgid "WebGrab++ settings"
+msgstr ""
+
+msgctxt "#30041"
+msgid "WebGrab++ script"
+msgstr ""
+
+msgctxt "#30042"
+msgid "WebGrab++ logfile"
+msgstr ""
+
+msgctxt "#30043"
+msgid "WebGrab++ xml-file"
+msgstr ""
+
+#empty strings from id 30044 to 30049
+
+msgctxt "#30050"
+msgid "Backend"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Socket transfer"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Socket"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Postprocessor"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Postprocessor script"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Update kodi EPG when finished"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Do not update when PVR busy"
+msgstr ""
+
+#empty strings from id 30057 to 30099
+
+msgctxt "#30100"
+msgid "WebGrab++ Manager"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Scheduler status:"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Next scheduled grab:"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Current channel grabbing:"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Grab progress:"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Latest grab finished:"
+msgstr ""
+
+msgctxt "#30106"
+msgid " seconds of grabbing"
+msgstr ""
+
+msgctxt "#30107"
+msgid " shows in database"
+msgstr ""
+
+msgctxt "#30108"
+msgid " channels"
+msgstr ""
+
+msgctxt "#30109"
+msgid " new shows added"
+msgstr ""
+
+msgctxt "#30110"
+msgid " shows updated"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Force Start"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Unknown"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Grabbing"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Idle"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Error"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Post-processing"
+msgstr ""
+

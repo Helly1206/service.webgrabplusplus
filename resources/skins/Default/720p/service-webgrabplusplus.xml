@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol always="true">10</defaultcontrol>
+	<coordinates>
+		<left>135</left>
+		<top>175</top>
+	</coordinates>
+	<animation effect="fade" time="200">WindowOpen</animation>
+	<animation effect="fade" time="200">WindowClose</animation>
+	<depth>0.52</depth>
+	<controls>
+		<control type="image">
+			<visible>![Window.IsVisible(FullscreenVideo) | Window.IsVisible(Visualisation)]</visible>
+			<description>background image</description>
+			<left>0</left>
+			<top>0</top>
+			<width>1010</width>
+			<height>375</height>
+			<texture border="40">DialogBack.png</texture>
+		</control>
+		<control type="image">
+			<visible>Window.IsVisible(FullscreenVideo) | Window.IsVisible(Visualisation)</visible>
+			<description>background image</description>
+			<left>0</left>
+			<top>0</top>
+			<width>1010</width>
+			<height>375</height>
+			<texture border="40">DialogBack2.png</texture>
+		</control>
+		<control type="image">
+			<description>Dialog Header image</description>
+			<left>40</left>
+			<top>16</top>
+			<width>930</width>
+			<height>40</height>
+			<texture>dialogheader.png</texture>
+		</control>
+		<control type="label" id="15">
+			<description>header label</description>
+			<left>40</left>
+			<top>20</top>
+			<width>930</width>
+			<height>30</height>
+			<font>font13_title</font>
+			<align>center</align>
+			<aligny>center</aligny>
+			<textcolor>FFEB9E17</textcolor>
+			<shadowcolor>FF000000</shadowcolor>
+		</control>
+		<control type="button" id="20">
+			<description>Close Window button</description>
+			<left>920</left>
+			<top>15</top>
+			<width>64</width>
+			<height>32</height>
+			<label>-</label>
+			<font>-</font>
+			<texturefocus>DialogCloseButton-focus.png</texturefocus>
+			<texturenofocus>DialogCloseButton.png</texturenofocus>
+			<onleft>10</onleft>
+			<onright>10</onright>
+			<onup>10</onup>
+			<ondown>10</ondown>
+			<visible>system.getbool(input.enablemouse)</visible>
+		</control>
+		<control type="label" id="30">
+			<description>Current Status</description>
+			<left>30</left>
+			<top>75</top>
+			<width>475</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="31">
+			<description>Current Status Value</description>
+			<left>515</left>
+			<top>75</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="image">
+			<left>30</left>
+			<top>110</top>
+			<width>480</width>
+			<height>180</height>
+			<texture border="15">ContentPanel.png</texture>
+			<include condition="!IsEmpty(Skin.String(MediaPanelTrans))">TransparentEffect</include>
+		</control>
+		<control type="image">
+			<left>30</left>
+			<top>290</top>
+			<width>480</width>
+			<height>64</height>
+			<texture border="15">ContentPanelMirror.png</texture>
+		</control>
+		<control type="label" id="32">
+			<description>Next Scheduled Update</description>
+			<left>30</left>
+			<top>125</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="33">
+			<description>Next Scheduled Update Value</description>
+			<left>300</left>
+			<top>125</top>
+			<width>200</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="34">
+			<description>Current Channel</description>
+			<left>30</left>
+			<top>180</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="35">
+			<description>Current Channel Value</description>
+			<left>300</left>
+			<top>180</top>
+			<width>200</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="36">
+			<description>Grab progress</description>
+			<left>30</left>
+			<top>210</top>
+			<width>250</width>
+			<height>20</height>
+			<align>right</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="37">
+			<description>Grab progress Value</description>
+			<left>300</left>
+			<top>210</top>
+			<width>200</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="progress" id="40">
+			<description>Progressbar</description>
+			<left>50</left>
+			<top>250</top>
+			<width>440</width>
+			<height>25</height>
+		</control>
+		<control type="image">
+			<left>510</left>
+			<top>110</top>
+			<width>480</width>
+			<height>180</height>
+			<texture border="15">ContentPanel.png</texture>
+			<include condition="!IsEmpty(Skin.String(MediaPanelTrans))">TransparentEffect</include>
+		</control>
+		<control type="image">
+			<left>510</left>
+			<top>290</top>
+			<width>480</width>
+			<height>64</height>
+			<texture border="15">ContentPanelMirror.png</texture>
+		</control>
+		<control type="label" id="51">
+			<description>Last Grab finished</description>
+			<left>510</left>
+			<top>125</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="52">
+			<description>Last Grab finished value</description>
+			<left>760</left>
+			<top>125</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="53">
+			<description>Duration value</description>
+			<left>510</left>
+			<top>150</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="54">
+			<description>Duration</description>
+			<left>760</left>
+			<top>150</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="55">
+			<description>Shows value</description>
+			<left>510</left>
+			<top>175</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="56">
+			<description>Shows</description>
+			<left>760</left>
+			<top>175</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="57">
+			<description>Channels value</description>
+			<left>510</left>
+			<top>200</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="58">
+			<description>Channels </description>
+			<left>760</left>
+			<top>200</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="59">
+			<description>Shows added value</description>
+			<left>510</left>
+			<top>225</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="60">
+			<description>Added shows</description>
+			<left>760</left>
+			<top>225</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="61">
+			<description>Shows updated value</description>
+			<left>510</left>
+			<top>250</top>
+			<width>250</width>
+			<height>25</height>
+			<align>right</align>
+			<font>font13</font>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="label" id="62">
+			<description>Updated shows</description>
+			<left>760</left>
+			<top>250</top>
+			<width>250</width>
+			<height>25</height>
+			<align>left</align>
+			<font>font13</font>
+			<textcolor>FF999999</textcolor>
+			<autoscroll time="3000" delay="4000" repeat="5000">true</autoscroll>
+		</control>
+		<control type="button" id="10">
+			<description>OK button</description>
+			<left>165</left>
+			<top>310</top>
+			<width>200</width>
+			<height>40</height>
+			<font>font12_title</font>
+			<textcolor>white</textcolor>
+			<focusedcolor>white</focusedcolor>
+			<align>center</align>
+			<onleft>10</onleft>
+			<onright>10</onright>
+			<onup>10</onup>
+			<ondown>10</ondown>
+		</control>
+	</controls>
+</window>
+

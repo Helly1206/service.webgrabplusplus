@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=WebGrab++ Manager
+Name[en_US]=WebGrab++ Manager
+Icon=/home/kodi/.kodi/addons/service.webgrabplusplus/icon.png
+Exec=/home/kodi/.kodi/addons/service.webgrabplusplus/resources/desktop/WebGrabGui
+Comment[en_US]=
+Path=/home/kodi/.kodi/addons/service.webgrabplusplus/resources/desktop/
+GenericName=WebGrab++ Manager
