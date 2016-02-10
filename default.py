@@ -12,6 +12,7 @@ import re
 import random
 import xbmc, xbmcaddon, xbmcgui
 import shutil
+import socket
 #########################################################
 
 ####################### GLOBALS #########################
@@ -30,6 +31,11 @@ SCHEDULERTIME = 10
 
 PB_BUSY = 0
 PB_CANCELED = 1
+
+CMD_FORCEGRAB = "FG"
+CMD_REQSTATUS = "S?"
+CMD_CONNQUIT  = "CQ"
+SOCKET_TIMEOUT = 20
 
 #PLATFORM_OE = True if ('OPENELEC' in ', '.join(platform.uname()).upper()) else False
 
@@ -54,6 +60,84 @@ class WGProgressBar(object):
     def Close(self):
         self.pb.close()
 
+class SocketChannel(object):
+    def __init__(self, port):
+        self.sock = None
+        self.ss = None
+        self.port = port
+        self.Open()
+        self.Counter=0
+        
+    def Open(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind(('localhost', self.port))
+        self.sock.listen(5) # become a server socket, maximum 5 connections
+        self.sock.setblocking(False)
+    
+    def TryConn(self):
+        Success = False
+        if self.ss != None:
+            Success = True
+        else:
+            try:
+                self.ss,sockname = self.sock.accept()
+                self.ss.settimeout(0.05)
+                self.Counter = 0
+                common.writeLog("[Remote] Socket connection established to: %s"%str(sockname))
+                Success = True
+            except socket.error, e:
+                #common.writeLog("[Remote] Error socket connection: %s"%e)
+                if self.ss != None:
+                    self.ss.close()
+                    self.ss = None
+                Success = False
+        return Success
+    
+    def Receive(self):
+        msg = None
+        try: 
+            msg = self.ss.recv(63)
+        except socket.timeout:
+            msg = None
+        except socket.error, e:
+            msg = None
+            common.writeLog("[Remote] Error socket connection: %s"%e)
+            if self.ss != None:
+                self.ss.close()
+                self.ss = None
+        else:
+            if len(msg) == 0:
+                msg = None
+                if (self.Counter < SOCKET_TIMEOUT):
+                    self.Counter += 1
+                else:
+                    if self.ss != None:
+                        self.ss.close()
+                        self.ss = None
+                    common.writeLog("[Remote] Socket connection closed by timeout")
+            else:
+                if (msg == CMD_CONNQUIT):
+                    if self.ss != None:
+                        self.ss.close()
+                        self.ss = None
+                    common.writeLog("[Remote] Socket connection closed")
+                    msg = None
+                else:
+                    self.Counter = 0
+        return msg
+    
+    def Send(self,msg):
+        try:
+            self.ss.send(msg)
+        except socket.error, e:
+            common.writeLog("[Remote] Error socket connection: %s"%e)
+            self.ss = None
+    
+    def Close(self):
+        self.sock.close()
+        self.sock = None
+
 #########################################################
 # Class : Manager                                       #
 #########################################################
@@ -70,6 +154,7 @@ class Manager(object):
         self.__TimeOutTime = 0
         self.getSettings()
         self.LogInfo = progress.LogFile(self.__epg_interval, self.__wg_logfile)
+        self.SockComm = SocketChannel(self.__socket_port)
         self.__StartupTime = self.LogInfo.EpochGetNow()
 
     ### read addon settings
@@ -94,7 +179,8 @@ class Manager(object):
         self.__post_transfer = True if __addon__.getSetting('post_transfer').upper() == 'TRUE' else False
         self.__post_script = __addon__.getSetting('post_script')
         self.__update_kodi = True if __addon__.getSetting('update_kodi').upper() == 'TRUE' else False
-        self.__not_update_running = True if __addon__.getSetting('not_update_running').upper() == 'TRUE' else False       
+        self.__not_update_running = True if __addon__.getSetting('not_update_running').upper() == 'TRUE' else False 
+        self.__socket_port = int(__addon__.getSetting('socket_port'))      
 
     def GetAndExecuteCommand(self):
         Command = common.getCommand()
@@ -106,6 +192,21 @@ class Manager(object):
                 common.setResponse("Busy")
         elif (Command == common.CMD_GETSTATUS):
             common.setResponse(common.BuildStatus(self.__Status))
+            
+    def GetAndExecuteSockCommand(self):
+        if self.SockComm.TryConn():
+            Command = self.SockComm.Receive()
+            #common.writeLog('Command: %s'%Command)
+            if Command == None:
+                return
+            if (Command == CMD_FORCEGRAB):
+                if (self.__Status == common.STAT_IDLE):
+                    self.__NextUpdate = self.LogInfo.EpochGetNow()
+                    self.SockComm.Send("Done")
+                else:
+                    self.SockComm.Send("Busy")
+            elif (Command == CMD_REQSTATUS):
+                self.SockComm.Send(common.BuildStatus(self.__Status))
                 
     def CalcTimeOut(self):
         if self.__hang_detection == 0:
@@ -266,8 +367,6 @@ class Manager(object):
                         common.writeLog("Socket not found, no socket transfer possible",xbmc.LOGERROR)
                         common.notifyOSD(__LS__(30014), __LS__(30011), common.IconStop)
                     Busy = (self.__post_transfer == True) or (self.__update_kodi == True)
-                    if (Busy == False):
-                    	common.writeLog('Post processing finished ...')
                 if self.__post_transfer == True:
                     if os.path.exists(self.__post_script):
                         self.Command.Run([self.__post_script])
@@ -293,8 +392,6 @@ class Manager(object):
                     common.notifyOSD(__LS__(30000), __LS__(30016),common.IconError)
                     self.Command.Kill()
                     Busy = False
-        else:
-        	Busy = False
         return Busy
                     
     def PostProcPost(self):
@@ -365,6 +462,7 @@ class Manager(object):
         while (not xbmc.abortRequested) and (not bKillMain):
             xbmc.sleep(common.COMMAND_LOOP)
             self.GetAndExecuteCommand()
+            self.GetAndExecuteSockCommand()
             if (SchedulerCount < SCHEDULERTIME):
                 SchedulerCount += 1
             else:
@@ -377,6 +475,7 @@ class Manager(object):
         ### END MAIN LOOP ###
         
         self.KillThreads()
+        self.SockComm.Close()
         common.Stop()
         common.writeLog('Service(%s) finished' % (self.__rndProcNum))
 

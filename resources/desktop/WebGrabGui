@@ -28,10 +28,8 @@ import gettext
 
 #imports
 import os, subprocess
-import json
 from xml.dom import minidom
 import time
-from itertools import chain
 import socket
 import getpass
 import sys
@@ -44,10 +42,9 @@ if sys.version_info.major == 3:
     from urllib.parse import urlencode
 else:
     from urllib2 import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, Request, build_opener
-    from urllib import urlencode
-    
-JSONGETPATH = '{"jsonrpc": "2.0", "method": "Addons.GetAddonDetails", "params": { "addonid": "service.webgrabplusplus","properties": ["path"]}, "id": 1 }'
-JSONEXECADDON = '{"jsonrpc": "2.0", "method": "Addons.ExecuteAddon", "params": { "wait": false, "addonid": "service.webgrabplusplus","params": %s}, "id": 1 }'
+    from urllib import urlencode  
+
+__addon__ = "service.webgrabplusplus"
 
 #globals
 settings = []
@@ -63,6 +60,10 @@ STAT_ERROR    = 4
 SOCKET_TIMEOUT = 5000 #ms
 COMM_RETRIES = 5
 
+CMD_FORCEGRAB = "FG"
+CMD_REQSTATUS = "S?"
+CMD_CONNQUIT  = "CQ"
+
 UPDATE_TIME = 5000 #milliseconds
 
 #########################################################
@@ -71,50 +72,6 @@ UPDATE_TIME = 5000 #milliseconds
 ### 
 
 millis = lambda: int(round(time.time() * 1000))
-
-def curl(url, params=None, auth=None, req_type="GET", data=None, headers=None):
-    post_req = ["POST", "PUT"]
-    get_req = ["GET", "DELETE"]
-
-    if params is not None:
-        url += "?" + urlencode(params)
-
-    if req_type not in post_req + get_req:
-        raise IOError("Wrong request type \"%s\" passed" % req_type)
-
-    _headers = {}
-    handler_chain = []
-
-    if auth is not None:
-        manager = HTTPPasswordMgrWithDefaultRealm()
-        manager.add_password(None, url, auth["user"], auth["pass"])
-        handler_chain.append(HTTPBasicAuthHandler(manager))
-
-    if req_type in post_req and data is not None:
-        _headers["Content-Length"] = len(data)
-
-    if headers is not None:
-        _headers.update(headers)
-
-    director = build_opener(*handler_chain)
-
-    if req_type in post_req:
-        if sys.version_info.major == 3:
-            _data = bytes(data, encoding='utf8')
-        else:
-            _data = bytes(data)
-
-        req = Request(url, headers=_headers, data=_data)
-    else:
-        req = Request(url, headers=_headers)
-
-    req.get_method = lambda: req_type
-    result = director.open(req)
-
-    return result.read()
-
-def JsonRPC(url, udata):
-    return curl(url, req_type="POST", data=udata, headers={"Content-Type":"application/json"})
     
 def getProcessPID(process):
     _syscmd = subprocess.Popen(['pidof', process], stdout=subprocess.PIPE)
@@ -158,91 +115,68 @@ def GetSettingsFromKodi(path):
         exit()
     return
     
-def GetPortFromKodi(path):
-    port = ""
-    if not os.path.isfile(path):
-        print "Settingsfile does not exist: %s" % (path)
-        dlg = wx.MessageDialog(None, 
-                "Settingsfile does not exist: %s" % (path),
-                "Settings error", wx.OK|wx.ICON_ERROR)
-        result = dlg.ShowModal()
-        dlg.Destroy()
-        exit()
-    
-    try:
-        __xml = minidom.parse(path)
-        nodes = __xml.getElementsByTagName("settings")
-        if nodes:
-            for node in nodes:
-                anodes=node.getElementsByTagName('services')
-                for a in anodes:
-                    aid=node.getElementsByTagName('webserverport')
-                    for b in aid:
-                        port=b.childNodes[0].data
-    except Exception, e:
-        print "Error reading from settingsfile: %s" % (path)
-        dlg = wx.MessageDialog(None, 
-                "Error reading from settingsfile: %s" % (path),
-                "Settings error", wx.OK|wx.ICON_ERROR)
-        result = dlg.ShowModal()
-        dlg.Destroy()
-        exit()
-    return port
-    
-def GetUserDataFolder():
+def GetDataFolder():
     pf = sys.platform.lower()
     usr = getpass.getuser()
     udf = ""
     if pf == 'linux' or pf == 'linux2':
-        udf = '/home/%s/.kodi/userdata/'%usr
+        udf = '/home/%s/.kodi/'%usr
     elif pf == 'windows':
-        udf = 'C:\Users\%s\AppData\Roaming\Kodi\userdata\\'%usr
+        udf = 'C:\\Users\\%s\\AppData\\Roaming\\Kodi\\'%usr
     elif pf == 'android':
-        udf = '/sdcard/Android/data/org.xbmc.kodi/files/.kodi/userdata/'
+        udf = '/sdcard/Android/data/org.xbmc.kodi/files/.kodi/'
     elif pf == 'ios':
-        udf = '/private/var/mobile/Library/Preferences/Kodi/userdata/'
+        udf = '/private/var/mobile/Library/Preferences/Kodi/'
     elif pf == 'darwin':
-        udf = '/Users/%s/Library/Application Support/Kodi/userdata/'%usr
+        udf = '/Users/%s/Library/Application Support/Kodi/'%usr
     return udf
 
 def OpenSocket():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('localhost', int(GetSetting("socket_port"))))
-    s.listen(5) # become a server socket, maximum 5 connections
-    s.settimeout(SOCKET_TIMEOUT/1000)
-    
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('localhost', int(GetSetting("socket_port"))))
+        s.settimeout(SOCKET_TIMEOUT/1000)
+    except Exception, e:
+        print ("[Remote] Error socket connection: %s"%e)
     return s
 
-def Communicate(s,url,cmd):
+def Communicate(s,cmd):
     tries = 0
     rec = ""
     while (rec == "") and (tries < COMM_RETRIES):
         tries += 1
         try:
-            res=json.loads(JsonRPC(url,JSONEXECADDON%cmd))['result']
-            if (res == "OK"):
-                rec=SocketReceive(s)
+            res=SocketSend(s,cmd)
+            rec=SocketReceive(s)
         except:
             print "Communication Error"
     return rec
+
+def SocketSend(s,msg):
+    try:
+        s.send(msg)
+    except socket.error, e:
+        print ("[Remote] Error socket connection: %s"%e)
+    return msg
 
 def SocketReceive(s):
     buf = ""
     
     try:
-        connection, address = s.accept()
-        buf = connection.recv(64)
+        #connection, address = s.accept()
+        buf = s.recv(63)
     except socket.timeout:
-        print "Timeout"
+        print "[Remote] Error socket connection: Timeout"
+    except socket.error, e:
+        print ("[Remote] Error socket connection: %s"%e)
     return buf
  
 def CloseSocket(s):
+    SocketSend(s, CMD_CONNQUIT)
     s.close()   
 
 def GetStatus(s):
-    Arguments = "\"-s\""   
-    rec = Communicate(s, url, Arguments)
+    rec = Communicate(s, CMD_REQSTATUS)
     if (rec == ""):
         print "Communication Error: Getstatus returned None"
         dlg = wx.MessageDialog(None, 
@@ -253,9 +187,8 @@ def GetStatus(s):
         exit()
     return int(rec)
     
-def SetStartGrabbing(s):
-    Arguments = "\"-g\""   
-    rec = Communicate(s, url, Arguments)
+def SetStartGrabbing(s):  
+    rec = Communicate(s, CMD_FORCEGRAB)
     if (rec == ""):
         print "Communication Error: SetStartGrabbing returned None"
         dlg = wx.MessageDialog(None, 
@@ -325,7 +258,7 @@ class TimerThread(threading.Thread):
                 prev_time = millis()
             else:
                 if self._grabevent.isSet():
-                    self._stopevent.clear()
+                    self._grabevent.clear()
                     SetStartGrabbing(self.socket)
                 time.sleep(0.5)
  
@@ -610,28 +543,14 @@ if __name__ == "__main__":
         dlg.Destroy()
         exit()
         
-    #global url
-    
-    if len(sys.argv) > 1:
-        url = "%s/jsonrpc"%sys.argv[1].lower()
-    else:
-        udf=GetUserDataFolder()
-        guisetpath = os.path.join(udf,"guisettings.xml")
-        port=GetPortFromKodi(guisetpath)
-        url = 'http://127.0.0.1:%s/jsonrpc'%port
-    
-    path = json.loads(JsonRPC(url,JSONGETPATH))['result']['addon']['path']
-    base,ext = os.path.split(path)
-    basepath,ext2 = os.path.split(base)
-    base = os.path.join(basepath,"userdata/addon_data")
-    settingspath = os.path.join(os.path.join(base,ext),"settings.xml")
+    base = os.path.join(GetDataFolder(),"userdata/addon_data")
+    settingspath = os.path.join(os.path.join(base,__addon__),"settings.xml")
+    libpath = os.path.join(os.path.join(os.path.join(GetDataFolder(),"addons"),__addon__),"resources/lib")
+    sys.path.append(libpath)
+    import progress
     
     #get settings
     GetSettingsFromKodi(settingspath)
-    
-    libpath = os.path.join(path,"resources/lib")
-    sys.path.append(libpath)
-    import progress
 
     frame_1 = MyFrame(None, wx.ID_ANY, "")
     app.SetTopWindow(frame_1)

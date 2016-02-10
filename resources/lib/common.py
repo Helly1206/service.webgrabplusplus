@@ -22,7 +22,7 @@ __logfile__ = os.path.join(__datapath__, __addonname__ + '.log')
 
 IconStop = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'stop.png'))
 IconError = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'error.png'))
-IconInfo = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'schedule.png'))
+IconInfo = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'wginfo.png'))
 
 # parameters
 CMD     = 'command'

@@ -54,6 +54,8 @@ UPDATE_TIME = 5
 
 CANCEL_DIALOG = (9, 10, 216, 247, 257, 275, 61448, 61467)
 
+SOCKET_TIMEOUT = 20000
+
 class GUI(xbmcgui.WindowXMLDialog):
 	
     def __init__(self, *args, **kwargs):
@@ -225,6 +227,8 @@ def SocketMsg(msg):
     except:
         common.writeLog("[Remote] Error sending return message: %s"%msg)
 
+
+
 #########################################################
 ######################## MAIN ###########################
 #########################################################
@@ -233,7 +237,7 @@ if len(sys.argv) > 1:
         PrintHelp()
     elif sys.argv[1].lower() == "-l": ## Just for testing, remove later
         SocketMsg("I'm alive !!!!")
-        common.writeLog("[Remote] Testing ...")
+        common.writeLog("[Remote] Testing communication ...")
     elif sys.argv[1].lower() == "-s":
         if common.IsRunning():
             status = common.DoComm(common.CMD_GETSTATUS)
