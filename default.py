@@ -156,6 +156,7 @@ class Manager(object):
         self.LogInfo = progress.LogFile(self.__epg_interval, self.__wg_logfile)
         self.SockComm = SocketChannel(self.__socket_port)
         self.__StartupTime = self.LogInfo.EpochGetNow()
+        self.__CurrentTry = 1
 
     ### read addon settings
 
@@ -214,9 +215,9 @@ class Manager(object):
         else:
             self.__TimeOutTime = self.LogInfo.EpochGetNow() + (self.__hang_detection*60)
             
-    def StartGrabbing(self, try2):
+    def StartGrabbing(self, try_):
         Failed = False
-        if try2 == False: # first try
+        if try_ == 1: # first try
             # Copy logfile to old
             if os.path.exists(self.__wg_logfile):
                 shutil.copy(self.__wg_logfile, "%s.old"%(self.__wg_logfile))
@@ -236,7 +237,7 @@ class Manager(object):
                 common.writeLog("EPG-update script not found",xbmc.LOGERROR)
                 common.notifyOSD(__LS__(30006), __LS__(30008), common.IconError)   
                 Failed = True 
-        else: # second try
+        elif try_ == 2: # second try
             # use fallback backup if failed
             if self.__backup_xml == True:
                 if os.path.exists("%s.fallback"%(self.__wg_xmlfile)):
@@ -260,6 +261,18 @@ class Manager(object):
                 common.writeLog("EPG-update script not found",xbmc.LOGERROR)
                 common.notifyOSD(__LS__(30006), __LS__(30008), common.IconError)  
                 Failed = True      
+        else: # third try 
+            # complete new grab
+            if os.path.exists(self.__wg_xmlfile):
+                os.remove(self.__wg_xmlfile)
+            else:
+                common.writeLog("No xml-file found to remove")
+            if os.path.exists(self.__wg_script):
+                self.Command.Run([self.__wg_script])
+            else:
+                common.writeLog("EPG-update script not found",xbmc.LOGERROR)
+                common.notifyOSD(__LS__(30006), __LS__(30008), common.IconError)  
+                Failed = True
         return Failed 
                 
     def GrabPre(self):
@@ -267,7 +280,8 @@ class Manager(object):
         self.CalcTimeOut()
         self.__CompChannelCounter = 0
         #start
-        self.__GrabFailed = self.StartGrabbing(False)
+        self.__CurrentTry = 1
+        self.__GrabFailed = self.StartGrabbing(self.__CurrentTry)
         if (not self.__GrabFailed):
             common.writeLog('Grabbing started ...')
             #notify
@@ -293,14 +307,20 @@ class Manager(object):
                 Busy = False
             else:
                 if self.__GrabFailed == True:
-                    common.writeLog("Error executing EPG update (2nd try)",xbmc.LOGERROR)
+                    common.writeLog("Error executing EPG update (3rd try)",xbmc.LOGERROR)
                     common.notifyOSD(__LS__(30006), __LS__(30009), common.IconError) 
                     Busy = False
-                else:
-                    self.__GrabFailed = True
+                elif self.__CurrentTry == 1:
                     common.writeLog("Error executing EPG update (1st try)",xbmc.LOGWARNING)
                     self.CalcTimeOut()
-                    Busy = not self.StartGrabbing(True)
+                    self.__CurrentTry = 2
+                    Busy = not self.StartGrabbing(self.__CurrentTry)
+                else:
+                    self.__GrabFailed = True
+                    common.writeLog("Error executing EPG update (2nd try)",xbmc.LOGWARNING)
+                    self.CalcTimeOut()
+                    self.__CurrentTry = 3
+                    Busy = not self.StartGrabbing(self.__CurrentTry)
         #timeout check
         if Busy == True:
             # Only read logfile after timeout time to save readings (and if no progressbar. Otherwise logfile is already been read)
@@ -315,11 +335,20 @@ class Manager(object):
                     common.notifyOSD(__LS__(30000), __LS__(30015),common.IconError)
                     self.Command.Kill()
                     if self.__GrabFailed == True:
+                        common.writeLog("Error executing EPG update (3rd try)",xbmc.LOGERROR)
+                        common.notifyOSD(__LS__(30006), __LS__(30009), common.IconError) 
                         Busy = False
+                    elif self.__CurrentTry == 1:
+                        common.writeLog("Error executing EPG update (1st try)",xbmc.LOGWARNING)
+                        self.CalcTimeOut()
+                        self.__CurrentTry = 2
+                        Busy = not self.StartGrabbing(self.__CurrentTry)
                     else:
+                        common.writeLog("Error executing EPG update (2nd try)",xbmc.LOGWARNING)
                         self.__GrabFailed = True
                         self.CalcTimeOut()
-                        Busy = not self.StartGrabbing(True)
+                        self.__CurrentTry = 3
+                        Busy = not self.StartGrabbing(self.__CurrentTry)
         return Busy
                     
     def GrabPost(self):
