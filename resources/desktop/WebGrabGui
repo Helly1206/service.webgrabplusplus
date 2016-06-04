@@ -35,7 +35,7 @@ import getpass
 import sys
 import re
 import threading
-import wx.lib.pubsub
+from wx.lib.pubsub import pub
 
 if sys.version_info.major == 3:
     from urllib.request import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, Request, build_opener
@@ -313,7 +313,8 @@ class TimerThread(threading.Thread):
         return True
     
     def postUpdate(self):
-        wx.lib.pubsub.Publisher().sendMessage("update", EncodeParams(self.Status, self.NextGrab, self.LogInfo.Epoch2Dates(self.WGInfoOld.FinishedTime), self.LogInfo.WGInfo, self.WGInfoOld)) 
+        pub.sendMessage("update", 
+        	Params=EncodeParams(self.Status, self.NextGrab, self.LogInfo.Epoch2Dates(self.WGInfoOld.FinishedTime), self.LogInfo.WGInfo, self.WGInfoOld)) 
         
 #########################################################
 # WX Class                                              #
@@ -360,7 +361,7 @@ class MyFrame(wx.Frame):
         self.button_force.Disable()
         
         # create a pubsub receiver
-        wx.lib.pubsub.Publisher().subscribe(self.updateDisplay, "update")
+        pub.subscribe(self.updateDisplay, "update")
         self.Timer = TimerThread()
 
     def __set_properties(self):
@@ -471,7 +472,7 @@ class MyFrame(wx.Frame):
         
     def updateDisplay(self, Params):
         #print Params.data
-        ParamsList = DecodeParams(Params.data)
+        ParamsList = DecodeParams(Params)
         self.DisplayStatus(ParamsList)
         self.DisplayNextGrab(ParamsList)
         self.DisplayProgress(ParamsList)           
