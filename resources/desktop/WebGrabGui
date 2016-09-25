@@ -217,7 +217,7 @@ _NEW = 9
 _UPDATED = 10
     
 def EncodeParams(Status,NextGrab, FinishTime, LogInfo, OldInfo):
-    strlist = [str(Status), NextGrab, LogInfo.Channel, str(LogInfo.ChannelCounter), str(LogInfo.Channels), FinishTime, str(OldInfo.Duration), str(OldInfo.Shows), str(OldInfo.TotalChannels), str(OldInfo.New), str(OldInfo.Updated)]
+    strlist = [str(Status), NextGrab, LogInfo.Channel, str(LogInfo.ChannelCounter), str(LogInfo.Channels), FinishTime, OldInfo.Duration, str(OldInfo.Shows), str(OldInfo.TotalChannels), str(OldInfo.New), str(OldInfo.Updated)]
     return "#".join(strlist)
 
 def DecodeParams(Enc):
@@ -326,23 +326,23 @@ class MyFrame(wx.Frame):
         # begin wxGlade: MyFrame.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        self.label_1 = wx.StaticText(self, wx.ID_ANY, _("Scheduler status:"), style=wx.ALIGN_RIGHT)
+        self.label_1 = wx.StaticText(self, wx.ID_ANY, _("Scheduler status:"), style=wx.ALIGN_LEFT)
         self.text_ctrl_status = wx.TextCtrl(self, wx.ID_ANY, _("Unknown"), style=wx.TE_READONLY)
         self.static_line_2 = wx.StaticLine(self, wx.ID_ANY)
-        self.label_4 = wx.StaticText(self, wx.ID_ANY, _("Next scheduled grab:"), style=wx.ALIGN_RIGHT)
+        self.label_4 = wx.StaticText(self, wx.ID_ANY, _("Next scheduled grab:"), style=wx.ALIGN_LEFT)
         self.text_ctrl_next = wx.TextCtrl(self, wx.ID_ANY, _("N/A"), style=wx.TE_READONLY)
-        self.label_2 = wx.StaticText(self, wx.ID_ANY, _("Current channel grabbing:"), style=wx.ALIGN_RIGHT)
+        self.label_2 = wx.StaticText(self, wx.ID_ANY, _("Current channel grabbing:"), style=wx.ALIGN_LEFT)
         self.text_ctrl_channel = wx.TextCtrl(self, wx.ID_ANY, _("-"), style=wx.TE_READONLY)
-        self.label_3 = wx.StaticText(self, wx.ID_ANY, _("Grab progress:"), style=wx.ALIGN_RIGHT)
+        self.label_3 = wx.StaticText(self, wx.ID_ANY, _("Grab progress:"), style=wx.ALIGN_LEFT)
         self.text_ctrl_progress = wx.TextCtrl(self, wx.ID_ANY, _("0/ 0"), style=wx.TE_READONLY)
         self.gauge_progress = wx.Gauge(self, wx.ID_ANY, 100)
         self.static_line_1 = wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL)
-        self.label_5 = wx.StaticText(self, wx.ID_ANY, _("Latest grab finished:"), style=wx.ALIGN_RIGHT)
+        self.label_5 = wx.StaticText(self, wx.ID_ANY, _("Latest grab finished:"), style=wx.ALIGN_LEFT)
         self.text_ctrl_latest = wx.TextCtrl(self, wx.ID_ANY, _("N/A"), style=wx.TE_READONLY)
         self.text_ctrl_seconds = wx.TextCtrl(self, wx.ID_ANY, _("0"), style=wx.TE_READONLY | wx.TE_RIGHT)
-        self.label_6 = wx.StaticText(self, wx.ID_ANY, _("seconds of grabbing"))
+        self.label_6 = wx.StaticText(self, wx.ID_ANY, _("grabbing time"))
         self.text_ctrl_shows = wx.TextCtrl(self, wx.ID_ANY, _("0"), style=wx.TE_READONLY | wx.TE_RIGHT)
-        self.label_7 = wx.StaticText(self, wx.ID_ANY, _("shows in databse"))
+        self.label_7 = wx.StaticText(self, wx.ID_ANY, _("shows in database"))
         self.text_ctrl_channels = wx.TextCtrl(self, wx.ID_ANY, _("0"), style=wx.TE_READONLY | wx.TE_RIGHT)
         self.label_8 = wx.StaticText(self, wx.ID_ANY, _("channels"))
         self.text_ctrl_new = wx.TextCtrl(self, wx.ID_ANY, _("0"), style=wx.TE_READONLY | wx.TE_RIGHT)
@@ -367,28 +367,28 @@ class MyFrame(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle(_("WebGrabGui - Gui for KODI WebGrab++ Manager"))
-        self.SetSize((689, 239))
-        self.label_1.SetMinSize((165, 15))
+        self.SetSize((689, 270)) #239
+        self.label_1.SetMinSize((165, 18))
         self.text_ctrl_status.SetMinSize((335, 27))
-        self.label_4.SetMinSize((165, 15))
+        self.label_4.SetMinSize((165, 18))
         self.text_ctrl_next.SetMinSize((165, 27))
-        self.label_2.SetMinSize((165, 15))
+        self.label_2.SetMinSize((165, 18))
         self.text_ctrl_channel.SetMinSize((165, 27))
-        self.label_3.SetMinSize((165, 15))
+        self.label_3.SetMinSize((165, 18))
         self.text_ctrl_progress.SetMinSize((165, 27))
         self.gauge_progress.SetMinSize((330, 28))
-        self.label_5.SetMinSize((165, 15))
+        self.label_5.SetMinSize((165, 18))
         self.text_ctrl_latest.SetMinSize((165, 27))
         self.text_ctrl_seconds.SetMinSize((165, 27))
-        self.label_6.SetMinSize((165, 15))
+        self.label_6.SetMinSize((165, 18))
         self.text_ctrl_shows.SetMinSize((165, 27))
-        self.label_7.SetMinSize((165, 15))
+        self.label_7.SetMinSize((165, 18))
         self.text_ctrl_channels.SetMinSize((165, 27))
-        self.label_8.SetMinSize((165, 15))
+        self.label_8.SetMinSize((165, 18))
         self.text_ctrl_new.SetMinSize((165, 27))
-        self.label_9.SetMinSize((165, 15))
+        self.label_9.SetMinSize((165, 18))
         self.text_ctrl_updated.SetMinSize((165, 27))
-        self.label_10.SetMinSize((165, 15))
+        self.label_10.SetMinSize((165, 18))
         self.button_force.SetMinSize((110, 27))
         # end wxGlade
 
@@ -532,8 +532,8 @@ class MyFrame(wx.Frame):
 if __name__ == "__main__":
     gettext.install("WebGrabGui") # replace with the appropriate catalog name
 
-    app = wx.PySimpleApp(0)
-    wx.InitAllImageHandlers()
+    app = wx.App(False)
+    #wx.InitAllImageHandlers()
     
     if not getProcessPID('kodi.bin'):
         print "Kodi not running, WebGrabGui not possible"
