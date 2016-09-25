@@ -220,13 +220,13 @@ class Manager(object):
         if try_ == 1: # first try
             # Copy logfile to old
             if os.path.exists(self.__wg_logfile):
-                shutil.copy(self.__wg_logfile, "%s.old"%(self.__wg_logfile))
+                shutil.copy2(self.__wg_logfile, "%s.old"%(self.__wg_logfile))
             else:
                 common.writeLog("log-file not found, no copy made",xbmc.LOGWARNING)
             # Make backup
             if self.__backup_xml == True:
                 if os.path.exists(self.__wg_xmlfile):
-                    shutil.copy(self.__wg_xmlfile, "%s.bak"%(self.__wg_xmlfile))
+                    shutil.copy2(self.__wg_xmlfile, "%s.bak"%(self.__wg_xmlfile))
                 else:
                     common.writeLog("xml-file not found, no backup made",xbmc.LOGERROR)
                     common.notifyOSD(__LS__(30006), __LS__(30007), common.IconStop)
@@ -364,7 +364,7 @@ class Manager(object):
             # backup to fallback backup if not failed  
             if self.__backup_xml == True: 
                 if os.path.exists("%s.bak"%(self.__wg_xmlfile)):
-                    shutil.copy("%s.bak"%(self.__wg_xmlfile), "%s.fallback"%(self.__wg_xmlfile))
+                    shutil.copy2("%s.bak"%(self.__wg_xmlfile), "%s.fallback"%(self.__wg_xmlfile))
                 else:
                     common.writeLog("xml-backup-file not found, no fallback file generated",xbmc.LOGWARNING)
                     common.notifyOSD(__LS__(30006), __LS__(30010), common.IconStop)

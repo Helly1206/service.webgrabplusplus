@@ -201,7 +201,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         iNew = self.WGInfoOld.New 
         iUpdated = self.WGInfoOld.Updated
         self.getControl(FIELD_LATEST).setLabel(" %s"%iLatest)
-        self.getControl(FIELD_SECONDS).setLabel(str(iSeconds))
+        self.getControl(FIELD_SECONDS).setLabel(iSeconds)
         self.getControl(FIELD_SHOWS).setLabel(str(iShows))
         self.getControl(FIELD_CHANNELS).setLabel(str(iChannels))
         self.getControl(FIELD_NEW).setLabel(str(iNew))
