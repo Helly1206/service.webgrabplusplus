@@ -6,6 +6,7 @@
 #########################################################
 
 ####################### IMPORTS #########################
+from builtins import str
 import sys, os
 import xbmc, xbmcaddon, xbmcgui
 import re
@@ -201,7 +202,7 @@ class GUI(xbmcgui.WindowXMLDialog):
         iNew = self.WGInfoOld.New 
         iUpdated = self.WGInfoOld.Updated
         self.getControl(FIELD_LATEST).setLabel(" %s"%iLatest)
-        self.getControl(FIELD_SECONDS).setLabel(iSeconds)
+        self.getControl(FIELD_SECONDS).setLabel(str(iSeconds))
         self.getControl(FIELD_SHOWS).setLabel(str(iShows))
         self.getControl(FIELD_CHANNELS).setLabel(str(iChannels))
         self.getControl(FIELD_NEW).setLabel(str(iNew))
@@ -259,7 +260,8 @@ if len(sys.argv) > 1:
         common.writeLog("Invalid option: %s" % sys.argv[1])
         SocketMsg("<Error>")
 else:
-    ui = GUI("%s.xml" % __addonname__.replace(".","-") , __addonpath__, "Default")
+    __gui_type = "Classic" if __addon__.getSetting('gui_type').upper() == 'CLASSIC' else "Default"
+    ui = GUI("%s.xml" % __addonname__.replace(".","-") , __addonpath__, __gui_type)
     ui.doModal()
     del ui
 

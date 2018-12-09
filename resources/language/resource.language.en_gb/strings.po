@@ -131,7 +131,11 @@ msgctxt "#30037"
 msgid "Socket return channel port"
 msgstr ""
 
-#empty strings from id 30038 to 30039
+msgctxt "#30038"
+msgid "Dialog look & feel"
+msgstr ""
+
+#empty strings with id 30039
 
 msgctxt "#30040"
 msgid "WebGrab++ settings"

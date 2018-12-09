@@ -10,6 +10,8 @@
 		<setting id="backup_xml" type="bool" label="30034" default="true" />
 		<setting id="separator2" type="sep" />
 		<setting id="socket_port" type="number" label="30037" default="8089" />
+		<setting id="separator3" type="sep" />
+		<setting id="gui_type" type="labelenum" label="30038" values="default|classic" default="default" />
 	</category>
 	<!-- WebGrab++ SETTINGS -->
 	<category label="30040">
@@ -23,7 +25,7 @@
 		<setting id="sck_url" type="file" label="30052" enable="eq(-1,true)" default="~/xmltv.sock" />
 		<setting id="post_transfer" type="bool" label="30053" default="false" />
 		<setting id="post_script" type="file" label="30054" enable="eq(-1,true)" default="~/postproc.sh" />
-		<setting id="separator3" type="sep" />
+		<setting id="separator4" type="sep" />
 		<setting id="update_kodi" type="bool" label="30055" default="false" />
 		<setting id="not_update_running" type="bool" label="30056" enable="eq(-1,true)" default="true" />
 	</category>

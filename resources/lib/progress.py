@@ -6,6 +6,7 @@
 #########################################################
 
 ####################### IMPORTS #########################
+from builtins import object
 import os
 import time, datetime
 
@@ -16,7 +17,7 @@ import time, datetime
 #########################################################    
 PARAM_NA = 'N/A'
 
-class WGInfo:
+class WGInfo(object):
     Channels = 0
     Channel = PARAM_NA
     ChannelCounter = 0
@@ -25,7 +26,7 @@ class WGInfo:
     Updated = 0
     New = 0
     FinishedTime = 0
-    Duration = PARAM_NA
+    Duration = 0
 
 #########################################################    
 
@@ -35,26 +36,15 @@ class LogFile(object):
         self.__epg_interval = interval
         self.__wg_logfile = logfile
         
-    def GetJobDetails(self, Line, mtime):
+    def GetJobDetails(self, Line):
         try:
             FinishedTime = self.WGDate2Epoch(Line.split('job finished at ')[1].split(' done in ')[0])
         except:
             FinishedTime = 0
         try:
-            d = int(Line.split(' done in ')[1].split(' seconds')[0])
-            m = d/60
-            s = d%60
-            Duration = "%dm %ds"%(m,s)
+            Duration = int(Line.split(' done in ')[1].split(' seconds')[0])
         except:
-            try:
-                m = int(Line.split(' done in ')[1].split('m')[0])
-                s = int(Line.split('m ')[1].split('s')[0])
-                Duration = "%dm %ds"%(m,s)
-            except:
-                Duration = "0"
-        dtime = abs (FinishedTime - int(mtime))
-        if (dtime > 20): # If more than 20 seconds time difference, take file time
-            FinishedTime = int(mtime)
+            Duration = 0
         return (FinishedTime, Duration)
 
     def GetUpdateChannels(self, Line):
@@ -66,19 +56,17 @@ class LogFile(object):
     
     def GetChannelName(self, Line):
         try:
-            if ') -- ' in Line:
-                Channel = Line.split('(xmltv_id=')[1].split(') -- ')[0]
-            elif ') site' in Line:
-                Channel = Line.split('(xmltv_id=')[1].split(') site')[0]
-            else:
-                Channel = Line.split('channel ')[1].split(' same as')[0]
+            Channel = Line.split('(xmltv_id=')[1].split(') site')[0]
         except:
-            Channel = None
+            try:
+                Channel = Line.split('channel ')[1].split(' same as')[0]
+            except:
+                Channel = None
         return Channel
 
     def GetShowsInChannels(self, Line):
         try:
-            Shows = int(Line.split('[  debug ] ')[1].split(' shows in ')[0])
+            Shows = int(Line.split('[  Debug ] ')[1].split(' shows in ')[0])
         except:
             Shows = 0
         try:
@@ -89,14 +77,14 @@ class LogFile(object):
 
     def GetShowsUpdated(self, Line):
         try:
-            Updated = int(Line.split('[  debug ] ')[1].split(' updated shows')[0])
+            Updated = int(Line.split('[  Debug ] ')[1].split(' updated shows')[0])
         except:
             Updated = 0
         return Updated
 
     def GetShowsNew(self, Line):
         try:
-            New = int(Line.split('[  debug ] ')[1].split(' new shows added')[0])
+            New = int(Line.split('[  Debug ] ')[1].split(' new shows added')[0])
         except:
             New = 0
         return New
@@ -110,33 +98,26 @@ class LogFile(object):
         self.WGInfo.Updated = 0
         self.WGInfo.New = 0
         self.WGInfo.FinishedTime = 0
-        self.WGInfo.Duration = PARAM_NA
+        self.WGInfo.Duration = 0
     
     def GetLogFile(self, oldlog):
         self.ClearLog()
         if oldlog == True: 
             if os.path.exists("%s.old"%(self.__wg_logfile)):
-                mtime = os.path.getmtime("%s.old"%(self.__wg_logfile))
                 datafile = file("%s.old"%(self.__wg_logfile))
             else:
                 oldlog = False
         if oldlog == False:
             if os.path.exists(self.__wg_logfile):
-                mtime = os.path.getmtime(self.__wg_logfile)
                 datafile = file(self.__wg_logfile)
             else:
                 datafile = None
-                mtime = 0
         if datafile != None:
-            for l in datafile:
-                line = l.lower()
-                if '[  info  ] update requested for' in line:
+            for line in datafile:
+                if '[  Info  ] update requested for' in line:
                     self.WGInfo.Channels = self.GetUpdateChannels(line)
-                if '[  info  ] channel ' in line:
-                    self.WGInfo.Channel = self.GetChannelName(l)
-                    self.WGInfo.ChannelCounter += 1
-                if ' -- chan. (' in line:
-                    self.WGInfo.Channel = self.GetChannelName(l)
+                if '[  Info  ] channel ' in line:
+                    self.WGInfo.Channel = self.GetChannelName(line)
                     self.WGInfo.ChannelCounter += 1
                 if ' shows in ' in line:
                     self.WGInfo.Shows, self.WGInfo.TotalChannels = self.GetShowsInChannels(line)
@@ -144,8 +125,8 @@ class LogFile(object):
                     self.WGInfo.Updated = self.GetShowsUpdated(line)
                 if ' new shows added' in line:
                     self.WGInfo.New = self.GetShowsNew(line)
-                if ' job finished at' in line:
-                    self.WGInfo.FinishedTime, self.WGInfo.Duration = self.GetJobDetails(line, mtime)
+                if '[  Info  ] job finished at' in line:
+                    self.WGInfo.FinishedTime, self.WGInfo.Duration = self.GetJobDetails(line)
         del datafile
         
     def ReadLogFile(self, onlycurrent = False):
@@ -156,7 +137,7 @@ class LogFile(object):
                 
     def CalcNextUpdate(self):
         if self.WGInfo.FinishedTime == 0:
-            NextUpdate = self.EpochGetNow() + (self.__epg_interval*3600) # Does not harm when setting it 12 hours from now (prevent loop)
+            NextUpdate = self.EpochGetNow()
         else:
             if self.__epg_interval == 0:
                 NextUpdate = 0
@@ -187,23 +168,18 @@ class LogFile(object):
         b = a[2].split(' ') 
         c = b[1].split(':')
         y = int(b[0])
-        if len(b) > 2:
-            m = int(a[0])
-            d = int(a[1])
-            if (b[2].lower() == 'am'):
-                if int(c[0]) == 12:
-                    h = 0
-                else:
-                    h = int(c[0])
+        m = int(a[0])
+        d = int(a[1])
+        if (b[2].lower() == 'am'):
+            if int(c[0]) == 12:
+                h = 0
             else:
-                if int(c[0]) == 12:
-                    h = int(c[0])
-                else:
-                    h = int(c[0]) + 12
+                h = int(c[0])
         else:
-            m = int(a[1])
-            d = int(a[0])
-            h = int(c[0])
+            if int(c[0]) == 12:
+                h = int(c[0])
+            else:
+                h = int(c[0]) + 12
         mn = int(c[1])
         s = int(c[2])
         return time.struct_time([y, m, d, h, mn, s, 0, 0, -1])
