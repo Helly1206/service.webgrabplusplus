@@ -1,9 +1,12 @@
 CHANGELOG
 
-[B]1.0.3[/B] From Kodi 18
+[B]1.0.4[/B] From Kodi 18
 - Updated skin to comply with kodi 18
 - Added new 'default' skin with modern look and feel and moved old skin to 'classic'
 - Converted to python 3 for future compatibility
+
+[B]1.0.3[/B]
+- Bug changes
 
 [B]1.0.2[/B]
 - Updated desktop script for wx 3
