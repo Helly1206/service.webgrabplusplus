@@ -6,7 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from builtins import str
 import sys, os
 import xbmc, xbmcaddon, xbmcgui
 import re

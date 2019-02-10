@@ -6,10 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from __future__ import division
-from builtins import str
-from past.utils import old_div
-from builtins import object
 import os, subprocess
 import xbmc, xbmcaddon, xbmcgui
 import time, datetime
@@ -208,7 +204,7 @@ def ParseStatus(StatusStr):
 def CalcProgress(iCurr, iMax):
     if (iMax == 0):
         return 0
-    return int(old_div(iCurr*100,iMax))    
+    return int((iCurr*100)/iMax)
 
 def notifyOSD(header, message, icon=xbmcgui.NOTIFICATION_INFO):
     OSD.notification(header.encode('utf-8'), message.encode('utf-8'), icon)
