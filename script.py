@@ -8,6 +8,7 @@
 ####################### IMPORTS #########################
 import sys, os
 import xbmc, xbmcaddon, xbmcgui
+import xbmcvfs
 import re
 import socket
 #########################################################
@@ -17,7 +18,7 @@ __addon__ = xbmcaddon.Addon()
 __addonname__ = __addon__.getAddonInfo('id')
 __addonpath__ = __addon__.getAddonInfo('path')
 __LS__ = __addon__.getLocalizedString
-__lib__ = xbmc.translatePath( os.path.join( __addonpath__, 'resources', 'lib' ).encode("utf-8") ).decode("utf-8")
+__lib__ = xbmcvfs.translatePath( os.path.join( __addonpath__, 'resources', 'lib' ).encode("utf-8") )
 
 sys.path.append(__lib__)
 import common

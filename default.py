@@ -11,6 +11,7 @@ import socket
 import re
 import random
 import xbmc, xbmcaddon, xbmcgui
+import xbmcvfs
 import shutil
 import socket
 #########################################################
@@ -21,7 +22,7 @@ __addonname__ = __addon__.getAddonInfo('id')
 __path__ = __addon__.getAddonInfo('path')
 __version__ = __addon__.getAddonInfo('version')
 __LS__ = __addon__.getLocalizedString
-__lib__ = xbmc.translatePath( os.path.join( __path__, 'resources', 'lib' ).encode("utf-8") ).decode("utf-8")
+__lib__ = xbmcvfs.translatePath( os.path.join( __path__, 'resources', 'lib' ).encode("utf-8") ) #.decode("utf-8")
 
 sys.path.append(__lib__)
 import common
@@ -97,7 +98,7 @@ class SocketChannel(object):
     def Receive(self):
         msg = None
         try: 
-            msg = self.ss.recv(63)
+            msg = self.ss.recv(63).decode("utf-8")
         except socket.timeout:
             msg = None
         except socket.error as e:
@@ -129,7 +130,7 @@ class SocketChannel(object):
     
     def Send(self,msg):
         try:
-            self.ss.send(msg)
+            self.ss.send(msg.encode("utf-8"))
         except socket.error as e:
             common.writeLog("[Remote] Error socket connection: %s"%e)
             self.ss = None
@@ -388,9 +389,11 @@ class Manager(object):
                     if os.path.exists(self.__sck_url):
                         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
                         s.connect(self.__sck_url)
-                        datafile = file(self.__wg_xmlfile)
+                        datafile = None
+                        with open(self.__wg_xmlfile, "r") as fp:
+                            datafile = fp.readlines()
                         for line in datafile:
-                            s.send(line)
+                            s.send(line.encode('utf-8'))
                         s.close()
                     else:
                         common.writeLog("Socket not found, no socket transfer possible",xbmc.LOGERROR)
@@ -488,7 +491,7 @@ class Manager(object):
         ### START MAIN LOOP ###
         # Wait 10 seconds before reading old logfile to overcome python timer bug
         SchedulerCount = 0
-        while (not xbmc.abortRequested) and (not bKillMain):
+        while (not xbmc.Monitor().abortRequested()) and (not bKillMain):
             xbmc.sleep(common.COMMAND_LOOP)
             self.GetAndExecuteCommand()
             self.GetAndExecuteSockCommand()

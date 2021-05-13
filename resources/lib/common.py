@@ -8,6 +8,7 @@
 ####################### IMPORTS #########################
 import os, subprocess
 import xbmc, xbmcaddon, xbmcgui
+import xbmcvfs
 import time, datetime
 from threading import Timer
 
@@ -17,12 +18,12 @@ from threading import Timer
 __addon__ = xbmcaddon.Addon()
 __addonname__ = __addon__.getAddonInfo('id')
 __path__ = __addon__.getAddonInfo('path')
-__datapath__ = xbmc.translatePath(os.path.join('special://temp/', __addonname__))
+__datapath__ = xbmcvfs.translatePath(os.path.join('special://temp/', __addonname__))
 __logfile__ = os.path.join(__datapath__, __addonname__ + '.log')
 
-IconStop = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'stop.png'))
-IconError = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'error.png'))
-IconInfo = xbmc.translatePath(os.path.join(__path__, 'resources', 'media', 'wginfo.png'))
+IconStop = xbmcvfs.translatePath(os.path.join(__path__, 'resources', 'media', 'stop.png'))
+IconError = xbmcvfs.translatePath(os.path.join(__path__, 'resources', 'media', 'error.png'))
+IconInfo = xbmcvfs.translatePath(os.path.join(__path__, 'resources', 'media', 'wginfo.png'))
 
 # parameters
 CMD     = 'command'
@@ -207,9 +208,9 @@ def CalcProgress(iCurr, iMax):
     return int((iCurr*100)/iMax)
 
 def notifyOSD(header, message, icon=xbmcgui.NOTIFICATION_INFO):
-    OSD.notification(header.encode('utf-8'), message.encode('utf-8'), icon)
+    OSD.notification(header, message, icon)
 
-def writeLog(message, level=xbmc.LOGNOTICE, forcePrint=False):
+def writeLog(message, level=xbmc.LOGINFO, forcePrint=False):
     if getParam(MSG) == message and not forcePrint:
         incParam(MSGCNT)
         return
@@ -225,10 +226,10 @@ def writeLog(message, level=xbmc.LOGNOTICE, forcePrint=False):
                     datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'), num(getParam(MSGCNT))))
             setParam(MSG, message)
             clearParam(MSGCNT)
-            __f.write('%s: %s\n' % (datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'), message.encode('utf-8')))
+            __f.write('%s: %s\n' % (datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'), message))
             __f.close()
         except Exception as e:
             xbmc.log('%s: %s' % (__addonname__, e), xbmc.LOGERROR)
-        xbmc.log('%s: %s' % (__addonname__, message.encode('utf-8')), level)    
+        xbmc.log('%s: %s' % (__addonname__, message), level)    
 
 #########################################################

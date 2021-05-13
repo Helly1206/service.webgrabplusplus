@@ -117,13 +117,17 @@ class LogFile(object):
         if oldlog == True: 
             if os.path.exists("%s.old"%(self.__wg_logfile)):
                 mtime = os.path.getmtime("%s.old"%(self.__wg_logfile))
-                datafile = file("%s.old"%(self.__wg_logfile))
+                datafile = None
+                with open("%s.old"%(self.__wg_logfile), "r") as fp:
+                    datafile = fp.readlines()
             else:
                 oldlog = False
         if oldlog == False:
             if os.path.exists(self.__wg_logfile):
                 mtime = os.path.getmtime(self.__wg_logfile)
-                datafile = file(self.__wg_logfile)
+                datafile = None
+                with open(self.__wg_logfile, "r") as fp:
+                    datafile = fp.readlines()
             else:
                 datafile = None
                 mtime = 0
